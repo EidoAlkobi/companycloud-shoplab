@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: background-cpu-noise
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: noise
+        image: companycloud-shoplab:local
+        imagePullPolicy: Never
+        command: ["python", "-c"]
+        args: ["import time, math; end=time.time()+300; x=0
+while time.time()<end:
+    x += sum(math.sqrt(i%100+1) for i in range(200000))
+print(x)"]

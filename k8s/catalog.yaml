@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  labels: {app: catalog}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: catalog}
+  template:
+    metadata:
+      labels: {app: catalog}
+    spec:
+      containers:
+      - name: app
+        image: companycloud-shoplab:local
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SERVICE_NAME
+          value: "catalog"
+
+        resources:
+          requests: {cpu: "50m", memory: "64Mi"}
+          limits: {cpu: "200m", memory: "128Mi"}
+        readinessProbe:
+          httpGet: {path: /health, port: 8080}
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet: {path: /health, port: 8080}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+spec:
+  selector: {app: catalog}
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
